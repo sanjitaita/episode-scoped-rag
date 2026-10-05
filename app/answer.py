@@ -1,4 +1,5 @@
 from app.llm import chat
+from app.llm import embed
 from app.retrieval import retrieve
 
 NOT_COVERED = "That hasn't come up in what you've watched."
@@ -17,7 +18,9 @@ Rules:
 9. Never say something is "revealed later" or "not revealed yet"."""
 
 
-def build_prompt(question: str, show: str, season: int, episode: int, matches: list[dict]) -> str:
+def build_prompt(
+    question: str, show: str, season: int, episode: int, matches: list[dict]
+) -> str:
     sections = []
     for match in matches:
         label = f"[S{match['season']}E{match['episode']}]"
@@ -31,11 +34,39 @@ def build_prompt(question: str, show: str, season: int, episode: int, matches: l
     )
 
 
-def answer(question: str, show: str, season: int, episode: int, k: int = 3) -> dict:
-    matches = retrieve(question, show, season, episode, k)
+def answer(
+    question: str,
+    show: str,
+    season: int,
+    episode: int,
+    k: int = 3,
+    collection=None,
+    embed_fn=embed,
+    chat_fn=chat,
+) -> dict:
+    matches = retrieve(
+        question,
+        show,
+        season,
+        episode,
+        k,
+        collection=collection,
+        embed_fn=embed_fn,
+    )
     if not matches:
         return {"answer": NOT_COVERED, "sources": []}
 
     prompt = build_prompt(question, show, season, episode, matches)
-    reply = chat(prompt, system=SYSTEM_PROMPT)
-    return {"answer": reply, "sources": matches}
+    reply = chat_fn(prompt, system=SYSTEM_PROMPT)
+
+    return {
+        "answer": reply,
+        "sources": [
+            {
+                "season": match["season"],
+                "episode": match["episode"],
+                "title": match["title"],
+            }
+            for match in matches
+        ],
+    }
