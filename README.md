@@ -67,20 +67,6 @@ python -m app.ingest
 
 Re-run that whenever anything in `data/shows/` changes.
 
-### Every new terminal session
-
-```bash
-cd path/to/episode-scoped-rag
-source .venv/bin/activate
-```
-
-Your prompt should start with `(.venv)`. Run `deactivate` to leave it.
-
-Run modules from the repo root with `python -m`, e.g. `python -m app.ingest`.
-
-> Virtual environments hardcode absolute paths. If you move the project folder, delete `.venv`
-> and recreate it.
-
 ## Running it
 
 ```bash
