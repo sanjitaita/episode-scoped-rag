@@ -46,3 +46,28 @@ def resolve_order(show: str, season: int, episode: int, collection=None) -> int:
         return record["metadatas"][0]["order"]
 
     raise ValueError(_describe_miss(collection, show, season, episode))
+
+
+def list_shows(collection=None) -> list[str]:
+    if collection is None:
+        collection = get_collection()
+    rows = collection.get(include=["metadatas"])["metadatas"]
+    return sorted({row["show"] for row in rows})
+
+
+def list_seasons(show: str, collection=None) -> list[dict]:
+    if collection is None:
+        collection = get_collection()
+
+    rows = collection.get(where={"show": show}, include=["metadatas"])["metadatas"]
+    if not rows:
+        raise ValueError(_describe_miss(collection, show, 1, 1))
+
+    seasons: dict[int, list[int]] = {}
+    for row in rows:
+        seasons.setdefault(row["season"], []).append(row["episode"])
+
+    return [
+        {"season": season, "episodes": sorted(episodes)}
+        for season, episodes in sorted(seasons.items())
+    ]
