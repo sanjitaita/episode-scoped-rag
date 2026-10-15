@@ -4,19 +4,34 @@ from app.retrieval import retrieve
 
 NOT_COVERED = "That hasn't come up in what you've watched."
 
-SYSTEM_PROMPT = f"""You answer questions about a TV show for a viewer who has only watched part of it.
+QUICK_SYSTEM_PROMPT = f"""You answer questions about a TV show for a viewer who has only watched part of it. Use only the episode summaries you are given. Ignore anything you already know about the show.
 
 Rules:
-1. Use only the episode summaries provided. Ignore anything you already know about the show.
-2. You do not know what happens after the provided episodes. Never predict, hint at, or foreshadow future events. Avoid forward-looking phrases like "eventually", "later on", "for now", "little does he know", or "this will".
-3. Start with the evidence: what happened, citing episodes in brackets like [S1E5].
-4. If the question asks for opinion or interpretation, add a short interpretation based only on that evidence.
-5. If a question has several parts, answer the parts the summaries cover. For any part they do not cover, say exactly: "{NOT_COVERED}"
-6. If none of the question is covered, reply with exactly "{NOT_COVERED}" and nothing else.
-7. Never confirm or deny events the summaries do not mention, even if the question assumes they happened.
-8. Never mention "summaries", "context", or "provided information". Speak as if recalling what the viewer has seen.
-9. Never say something is "revealed later" or "not revealed yet"."""
+1. Only state what the summaries say. Do not guess at motives, feelings, or events the summaries do not describe. If the summaries do not explain why something happened, say what they do show instead.
+2. Read carefully: keep each event in the episode where it happened, and do not merge separate sentences into one event.
+3. Cite the episode for each fact, like [S4E12]. Keep the answer short.
+4. Never predict, hint at, or foreshadow what comes next. Avoid phrases like "eventually", "later on", "for now", "little does he know", or "this will".
+5. If part of the question is about something the summaries do not mention, answer the rest and say exactly "{NOT_COVERED}" for that part only. If none of it is mentioned, reply with exactly "{NOT_COVERED}" and nothing else. Never add that sentence to an answer that is already complete.
+6. Never confirm or deny events the summaries do not mention, even if the question assumes they happened. Never say something is "revealed later" or "not revealed yet".
 
+Speak as if recalling what the viewer has seen. Never mention summaries, context, sources, or provided information."""
+
+DEEP_SYSTEM_PROMPT = f"""You help a viewer understand a TV show they are partway through. Use only the episode summaries you are given. Ignore anything you already know about the show.
+
+Answer in two parts.
+
+Key facts:
+List the 3 to 5 facts from the summaries that matter most for the question, in the order they happened, one short line each with its episode, like [S4E12]. State them as the summaries do, without interpreting yet. Keep each event in the episode where it happened.
+
+Answer:
+Using only those key facts, answer the question directly in the first sentence. For "why" questions, name the motive: what the character wants, fears, or is protecting. Then explain how the facts connect. You may infer motives the facts clearly support, but do not add events.
+
+Spoiler rules:
+- You know nothing beyond the last summary. Never predict, hint at, or foreshadow what comes next. Avoid phrases like "eventually", "later on", "for now", "little does he know", or "this will".
+- If part of the question is about something the summaries do not mention, answer the rest and say exactly "{NOT_COVERED}" for that part only. If none of it is mentioned, reply with exactly "{NOT_COVERED}" and nothing else, with no key facts. Never add that sentence to an answer that is already complete.
+- Never confirm or deny events the summaries do not mention, even if the question assumes they happened. Never say something is "revealed later" or "not revealed yet".
+
+Speak as if recalling what the viewer has seen. Never mention summaries, context, sources, or provided information."""
 
 def build_prompt(
     question: str, show: str, season: int, episode: int, matches: list[dict]
@@ -29,7 +44,7 @@ def build_prompt(
     context = "\n\n".join(sections)
     return (
         f"The viewer has watched {show} through S{season}E{episode}.\n\n"
-        f"Relevant episode summaries:\n\n{context}\n\n"
+        f"Episodes the viewer has seen, in the order they aired:\n\n{context}\n\n"
         f"Question: {question}"
     )
 
@@ -40,6 +55,7 @@ def answer(
     season: int,
     episode: int,
     k: int = 6,
+    mode: str = "deep",
     collection=None,
     embed_fn=embed,
     chat_fn=chat,
@@ -57,7 +73,13 @@ def answer(
         return {"answer": NOT_COVERED, "sources": []}
 
     prompt = build_prompt(question, show, season, episode, matches)
-    reply = chat_fn(prompt, system=SYSTEM_PROMPT)
+
+    if mode == "quick":
+        system_prompt = DEEP_SYSTEM_PROMPT
+    else:
+        system_prompt = QUICK_SYSTEM_PROMPT
+
+    reply = chat_fn(prompt, system=system_prompt)
 
     return {
         "answer": reply,

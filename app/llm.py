@@ -24,7 +24,7 @@ def chat(prompt: str, system: str | None = None, temperature: float = 0.2) -> st
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    options = {"temperature": temperature}
+    options = {"temperature": temperature, "num_ctx": 8192}
 
     try:
         response = ollama.chat(
