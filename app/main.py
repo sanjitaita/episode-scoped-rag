@@ -40,7 +40,11 @@ def get_seasons(show: str):
 def post_ask(request: AskRequest):
     try:
         return answer(
-            request.question, request.show, request.season, request.episode
+            request.question,
+            request.show,
+            request.season,
+            request.episode,
+            mode=request.mode,
         )
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))

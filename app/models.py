@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, Field
 
 
@@ -12,6 +13,7 @@ class AskRequest(BaseModel):
     season: int = Field(ge=1)
     episode: int = Field(ge=1)
     question: str = Field(min_length=1, max_length=1000)
+    mode: Literal["quick", "deep"] = "quick"
 
 
 class AskResponse(BaseModel):
