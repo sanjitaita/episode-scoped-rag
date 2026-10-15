@@ -1,4 +1,5 @@
-import { getSeasons, getShows } from "./api.js";
+import { askQuestion, getSeasons, getShows } from "./api.js";
+import { renderChat } from "./chat.js";
 import { renderHome } from "./home.js";
 import { openPicker } from "./picker.js";
 import { el, recall, remember, slugify } from "./util.js";
@@ -41,7 +42,28 @@ async function showHome() {
 }
 
 async function showChat(slug, season, episode) {
-  showStatus(`Chat for ${slug} through S${season}·E${episode} is coming in the next commit.`);
+  const shows = await loadShows();
+  const show = shows.find((name) => slugify(name) === slug);
+  if (!show) {
+    location.hash = "#/";
+    return;
+  }
+
+  const seasons = await loadSeasons(show);
+  const valid = seasons.some((entry) => entry.season === season && entry.episodes.includes(episode));
+  if (!valid) {
+    location.hash = "#/";
+    return;
+  }
+
+  renderChat(
+    app,
+    { show, season, episode, seasons },
+    {
+      ask: askQuestion,
+      onChange: () => choose(show, { season, episode }),
+    }
+  );
 }
 
 async function route() {
