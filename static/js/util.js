@@ -71,3 +71,17 @@ export function recall(show) {
     return null;
   }
 }
+
+export function loadSetting(key, fallback) {
+  try {
+    return localStorage.getItem(key) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function saveSetting(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
+}

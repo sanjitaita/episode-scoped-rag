@@ -20,10 +20,10 @@ export async function getSeasons(show) {
   return data.seasons;
 }
 
-export async function askQuestion(show, season, episode, question) {
+export async function askQuestion(show, season, episode, question, mode) {
   return request("/api/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ show, season, episode, question }),
+    body: JSON.stringify({ show, season, episode, question, mode }),
   });
 }

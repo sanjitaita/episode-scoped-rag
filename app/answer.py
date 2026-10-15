@@ -55,7 +55,7 @@ def answer(
     season: int,
     episode: int,
     k: int = 6,
-    mode: str = "deep",
+    mode: str = "quick",
     collection=None,
     embed_fn=embed,
     chat_fn=chat,
@@ -74,7 +74,7 @@ def answer(
 
     prompt = build_prompt(question, show, season, episode, matches)
 
-    if mode == "quick":
+    if mode == "deep":
         system_prompt = DEEP_SYSTEM_PROMPT
     else:
         system_prompt = QUICK_SYSTEM_PROMPT

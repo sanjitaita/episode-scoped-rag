@@ -1,10 +1,21 @@
-import { code, el, episodeCount, progressBar, watchOrder } from "./util.js";
+import { code, el, episodeCount, loadSetting, progressBar, saveSetting, watchOrder } from "./util.js";
 
 const SUGGESTIONS = [
   "Catch me up on the last episode I watched.",
   "Who are the main characters so far?",
   "What's the biggest conflict right now?",
 ];
+
+const MODES = {
+  quick: {
+    label: "Quick",
+    hint: "Fast and sticks to what happened. It can miss or misstate details, so use Deep for “why” questions.",
+  },
+  deep: {
+    label: "Deep",
+    hint: "Lists the key facts first, then explains. Slower, but better for motives and analysis.",
+  },
+};
 
 function escapeHtml(text) {
   return text
@@ -14,16 +25,50 @@ function escapeHtml(text) {
     .replaceAll('"', "&quot;");
 }
 
-function formatAnswer(text) {
-  return escapeHtml(text.trim())
+function formatInline(text) {
+  return escapeHtml(text).replace(/\[S(\d+)E(\d+)\]/g, '<span class="cite">S$1·E$2</span>');
+}
+
+function formatParagraphs(text) {
+  return text
+    .trim()
     .split(/\n{2,}/)
-    .map((paragraph) =>
-      paragraph
-        .replace(/\[S(\d+)E(\d+)\]/g, '<span class="cite">S$1·E$2</span>')
-        .replace(/\n/g, "<br>")
-    )
-    .map((paragraph) => `<p>${paragraph}</p>`)
+    .map((paragraph) => `<p>${formatInline(paragraph).replace(/\n/g, "<br>")}</p>`)
     .join("");
+}
+
+function splitDeep(text) {
+  const match = text.match(/key facts:?\s*([\s\S]*?)\n\s*\**answer:?\**\s*([\s\S]*)/i);
+  if (!match) {
+    return null;
+  }
+  const facts = match[1]
+    .split("\n")
+    .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim())
+    .filter((line) => line.length > 0);
+  return { facts, answer: match[2].trim() };
+}
+
+function renderReply(container, text) {
+  const deep = splitDeep(text);
+  if (!deep || !deep.answer) {
+    container.innerHTML = formatParagraphs(text);
+    return;
+  }
+
+  container.innerHTML = formatParagraphs(deep.answer);
+  if (deep.facts.length) {
+    const list = el("ul", { class: "facts-list" });
+    list.innerHTML = deep.facts.map((fact) => `<li>${formatInline(fact)}</li>`).join("");
+    container.append(
+      el(
+        "details",
+        { class: "facts" },
+        el("summary", { class: "facts-summary mono" }, `Key facts (${deep.facts.length})`),
+        list
+      )
+    );
+  }
 }
 
 function sourceList(sources) {
@@ -45,6 +90,7 @@ export function renderChat(root, watch, { onChange, ask }) {
   const order = watchOrder(seasons, season, episode);
   const total = episodeCount(seasons);
   const range = order === 1 ? "episode 1" : `episodes 1–${order}`;
+  let mode = loadSetting("answer-mode", "quick") === "deep" ? "deep" : "quick";
 
   const log = el("div", { class: "log", "aria-live": "polite" });
   const input = el("textarea", {
@@ -54,6 +100,28 @@ export function renderChat(root, watch, { onChange, ask }) {
     "aria-label": "Your question",
   });
   const send = el("button", { class: "btn btn-primary", type: "submit" }, "Ask");
+  const hint = el("p", { class: "mode-hint" });
+  const switcher = el("div", { class: "mode-switch", role: "radiogroup", "aria-label": "Answer style" });
+
+  function setMode(next) {
+    mode = next;
+    saveSetting("answer-mode", mode);
+    for (const option of switcher.children) {
+      option.setAttribute("aria-checked", String(option.dataset.mode === mode));
+    }
+    hint.textContent = MODES[mode].hint;
+  }
+
+  for (const [key, value] of Object.entries(MODES)) {
+    switcher.append(
+      el(
+        "button",
+        { class: "mode-option", type: "button", role: "radio", "data-mode": key, onClick: () => setMode(key) },
+        value.label
+      )
+    );
+  }
+  setMode(mode);
 
   const empty = el(
     "div",
@@ -78,6 +146,9 @@ export function renderChat(root, watch, { onChange, ask }) {
   function setBusy(busy) {
     input.disabled = busy;
     send.disabled = busy;
+    for (const option of switcher.children) {
+      option.disabled = busy;
+    }
   }
 
   async function submit(question) {
@@ -86,20 +157,39 @@ export function renderChat(root, watch, { onChange, ask }) {
       return;
     }
 
+    const askedMode = mode;
     empty.remove();
     input.value = "";
     resize();
     setBusy(true);
 
-    const reply = el("div", { class: "entry-a entry-pending" }, `Reading ${range}`);
-    const entry = el("article", { class: "entry" }, el("p", { class: "entry-q" }, text), reply);
+    const status = askedMode === "deep" ? `Thinking it through · ${range}` : `Reading ${range}`;
+    const reply = el("div", { class: "entry-a entry-pending" }, status);
+    const entry = el(
+      "article",
+      { class: "entry" },
+      askedMode === "deep" ? el("span", { class: "entry-mode mono" }, "Deep") : null,
+      el("p", { class: "entry-q" }, text),
+      reply
+    );
     log.append(entry);
     entry.scrollIntoView({ behavior: "smooth", block: "start" });
 
+    const started = Date.now();
+    const timer = setInterval(() => {
+      const seconds = Math.round((Date.now() - started) / 1000);
+      if (seconds >= 5) {
+        reply.textContent = `${status} · ${seconds}s`;
+      }
+    }, 1000);
+
     try {
-      const result = await ask(show, season, episode, text);
+      const result = await ask(show, season, episode, text, askedMode);
+      if (!result.answer || !result.answer.trim()) {
+        throw new Error("The model didn't finish an answer. Try asking again.");
+      }
       reply.className = "entry-a";
-      reply.innerHTML = formatAnswer(result.answer);
+      renderReply(reply, result.answer);
       const sources = sourceList(result.sources);
       if (sources) {
         entry.append(sources);
@@ -108,6 +198,7 @@ export function renderChat(root, watch, { onChange, ask }) {
       reply.className = "entry-a entry-error";
       reply.textContent = error.message || "Something went wrong. Try again.";
     } finally {
+      clearInterval(timer);
       setBusy(false);
       input.focus();
     }
@@ -130,6 +221,7 @@ export function renderChat(root, watch, { onChange, ask }) {
         submit(input.value);
       },
     },
+    el("div", { class: "composer-bar" }, switcher, hint),
     el("div", { class: "composer-box" }, input, send),
     el(
       "p",

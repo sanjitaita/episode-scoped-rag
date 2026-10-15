@@ -421,7 +421,7 @@ textarea {
   top: 0;
   z-index: 2;
   background: var(--bg);
-  padding: 8px 0 0;
+  padding: 8px 0 16px;
 }
 
 .chat-back {
@@ -648,6 +648,91 @@ textarea {
   font-size: 13px;
 }
 
+.entry-mode {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.facts {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-sunken);
+}
+
+.facts-summary {
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.facts-summary:hover {
+  color: var(--muted);
+}
+
+.facts-list {
+  margin: 12px 0 2px;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.facts-list li {
+  margin-bottom: 6px;
+}
+
+.composer-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.mode-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+}
+
+.mode-option {
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mode-option:hover {
+  color: var(--text);
+}
+
+.mode-option[aria-checked="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.mode-option:disabled {
+  cursor: not-allowed;
+}
+
+.mode-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--faint);
+}
+
 .status {
   padding: 64px 0;
   color: var(--muted);
@@ -683,6 +768,12 @@ textarea {
 
   .entry-q {
     font-size: 22px;
+  }
+
+  .composer-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .picker-body {
