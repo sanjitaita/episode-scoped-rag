@@ -1,4 +1,4 @@
-from app.episodes import resolve_order
+from app.episodes import episode_id, resolve_order
 from app.ingest import get_collection
 from app.llm import embed
 
@@ -12,7 +12,7 @@ def retrieve(
     show: str,
     season: int,
     episode: int,
-    k: int = 3,
+    k: int = 6,
     collection=None,
     embed_fn=embed,
 ) -> list[dict]:
@@ -50,5 +50,31 @@ def retrieve(
                 "distance": distance,
             }
         )
+
+    found = False;
+    for match in matches:
+        if match["order"] == order:
+            found = True;
+            break;
+
+    if not found:
+        latest = collection.get(
+            ids=[episode_id(show, season, episode)],
+            include=["documents", "metadatas"],
+        )
+
+        latest_meta = latest["metadatas"][0]
+        matches.append(
+            {
+                "text": latest["documents"][0],
+                "title": latest_meta["title"],
+                "season": latest_meta["season"],
+                "episode": latest_meta["episode"],
+                "order": latest_meta["order"],
+                "distance": None,
+            }
+        )
+        
+    matches.sort(key=lambda match: match["order"])
 
     return matches

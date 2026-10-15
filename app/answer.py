@@ -39,7 +39,7 @@ def answer(
     show: str,
     season: int,
     episode: int,
-    k: int = 3,
+    k: int = 6,
     collection=None,
     embed_fn=embed,
     chat_fn=chat,
