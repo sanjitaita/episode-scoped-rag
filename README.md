@@ -1,4 +1,4 @@
-# episode-scoped-rag
+# Unspoiled AI
 
 Spoiler-safe Q&A for TV shows: answers are built only from episodes the user has already watched.
 
