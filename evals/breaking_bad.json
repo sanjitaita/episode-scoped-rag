@@ -1,0 +1,55 @@
+[
+  {"id": "krazy8", "show": "Breaking Bad", "season": 1, "episode": 3,
+   "question": "What happened to Krazy-8?",
+   "modes": ["quick", "deep"], "refuse": false,
+   "must_include": [["strangl", "bike lock"]],
+   "must_not_include": [],
+   "expected_sources": [[1, 3]]},
+
+  {"id": "gus-too-early", "show": "Breaking Bad", "season": 1, "episode": 2,
+   "question": "Who is Gus Fring?",
+   "modes": ["quick", "deep"], "refuse": true},
+
+  {"id": "brock-false-premise", "show": "Breaking Bad", "season": 1, "episode": 2,
+   "question": "Why did Walter poison Brock?",
+   "modes": ["quick", "deep"], "refuse": true},
+
+  {"id": "tuco-before", "show": "Breaking Bad", "season": 1, "episode": 5,
+   "question": "Who is Tuco Salamanca?",
+   "modes": ["quick", "deep"], "refuse": true},
+
+  {"id": "tuco-after", "show": "Breaking Bad", "season": 1, "episode": 6,
+   "question": "Who is Tuco Salamanca?",
+   "modes": ["quick", "deep"], "refuse": false,
+   "must_include": [["distributor", "dealer"]],
+   "must_not_include": [],
+   "expected_sources": [[1, 6]]},
+
+  {"id": "cancer-no-foreshadow", "show": "Breaking Bad", "season": 2, "episode": 9,
+   "question": "How is Walter's cancer going?",
+   "modes": ["quick", "deep"], "refuse": false,
+   "must_include": [["remission", "shrunk"]],
+   "must_not_include": ["for now", "for the time being", "eventually", "later on", "takes a turn", "little does"],
+   "expected_sources": [[2, 9]]},
+
+  {"id": "multipart", "show": "Breaking Bad", "season": 2, "episode": 5,
+   "question": "Who is Jesse's neighbor, and how does Hank get shot?",
+   "modes": ["quick", "deep"], "refuse": false,
+   "must_include": [["Jane"], ["hasn't come up"]],
+   "must_not_include": ["cousin", "Leonel", "Marco", "parking lot"],
+   "expected_sources": [[2, 5]]},
+
+  {"id": "combo-merge", "show": "Breaking Bad", "season": 3, "episode": 12,
+   "question": "Who killed Combo?",
+   "modes": ["quick", "deep"], "refuse": false,
+   "must_include": [["boy", "kid", "child", "Tomás", "Tomas"]],
+   "must_not_include": ["Walt killed Combo", "Jesse killed Combo", "Walt shot Combo"],
+   "expected_sources": [[2, 11]]},
+
+  {"id": "jane-why", "show": "Breaking Bad", "season": 2, "episode": 13,
+   "question": "Why did Walt let Jane die?",
+   "modes": ["deep"], "refuse": false,
+   "must_include": [["blackmail", "threaten", "expose"]],
+   "must_not_include": [],
+   "expected_sources": [[2, 12]]}
+]
