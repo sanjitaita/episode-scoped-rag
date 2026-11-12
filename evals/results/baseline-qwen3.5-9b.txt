@@ -1,0 +1,70 @@
+Model: qwen3.5:9b   runs per question: 3
+
+krazy8                 quick  3/3
+krazy8                 deep   3/3
+gus-too-early          quick  3/3
+gus-too-early          deep   0/3
+    run 1: should have refused
+    answer: Key facts:
+- [S1E1] Walt tracks down former student Jesse Pinkman after watching him escape a DEA raid and proposes a deal to cook methamphetamine together.
+- [S1E2] Walt and Jesse find that Emilio died from the gas but Krazy-8 survived, and they end up holding Krazy-8 prisoner in Jesse's basement.
+
+Answer:
+Gus Fring has not appeared or been mentioned in the episodes you have watched so far; his identity is unknown to the characters and viewers at this point in the story. That hasn't come up in what you've watched.
+    run 2: should have refused
+    answer: Key facts:
+- [S1E1] Walt tracks down former student Jesse Pinkman after watching him escape during a DEA raid.
+- [S1E2] The summaries detail the disposal of Emilio's body, Krazy-8 being held prisoner, Skyler confronting Jesse, and kids finding a gas mask left behind.
+
+Answer:
+Gus Fring has not appeared or been mentioned in the episodes you have watched so far; that hasn't come up in what you've watched.
+    run 3: should have refused
+    answer: Key facts:
+- [S1E1] Walt tracks down former student Jesse Pinkman after watching him escape during a DEA raid.
+- [S1E2] Walt and Jesse hold Emilio's partner Krazy-8 prisoner in Jesse's basement while dealing with the aftermath of their first meth cook and body disposal.
+
+Answer:
+Gus Fring has not appeared or been mentioned in the episodes you have watched so far; that hasn't come up in what you've watched.
+brock-false-premise    quick  3/3
+brock-false-premise    deep   3/3
+tuco-before            quick  3/3
+tuco-before            deep   0/3
+    run 1: should have refused
+    answer: Key facts:
+- [S1E1] Walt tracks down Jesse Pinkman and proposes a deal to cook methamphetamine together after Walt is diagnosed with inoperable lung cancer.
+- [S1E2] Walt and Jesse find that Emilio died from the gas but Krazy-8 survived, and they end up holding Krazy-8 prisoner in Jesse's basement.
+- [S1E3] Walt agonizes over whether to kill Krazy-8, admits to him that he has lung cancer, and eventually strangles him to death with a bike lock after Krazy-8 tries to attack Walt.
+- [S1E4] Hank reports that Emilio and Krazy-8 have vanished, and a new 99.1% pure meth is turning up in Albuquerque.
+
+Answer:
+Tuco Salamanca has not come up in what you've watched. That hasn't come up in what you've watched.
+    run 2: should have refused
+    answer: Key facts:
+- [S1E1] Walt tracks down Jesse Pinkman and proposes a deal to cook methamphetamine together after Walt is diagnosed with inoperable lung cancer.
+- [S1E2] Walt and Jesse find that Emilio died from gas but Krazy-8 survived, and they end up holding Krazy-8 prisoner in Jesse's basement.
+- [S1E3] Walt agonizes over whether to kill Krazy-8, admits his cancer to him, decides to let him go, but Krazy-8 lunges for him and Walt strangles him to death with a bike lock.
+- [S1E4] Hank reports that Emilio and Krazy-8, who turns out to have been a DEA informant, have vanished, and that a new 99.1% pure meth is turning up in Albuquerque.
+- [S1E5] Walt attends a birthday party for Elliott Schwartz, refuses a job offer due to his cancer diagnosis, and then shows up at Jesse's door ready to cook again.
+
+Answer:
+That hasn't come up in what you've watched.
+    run 3: should have refused
+    answer: Key facts:
+- [S1E1] Walt and Jesse buy an old RV and cook methamphetamine in the desert.
+- [S1E2] They find that Emilio died from the gas but Krazy-8 survived, and they end up holding Krazy-8 prisoner in Jesse's basement.
+- [S1E3] Walt decides to let Krazy-8 go, but while piecing the broken plate back together, he realizes a sharp shard is missing and that Krazy-8 has hidden it as a weapon.
+- [S1E4] Hank reports that Emilio and Krazy-8, who turns out to have been a DEA informant, have vanished.
+
+Answer:
+That hasn't come up in what you've watched.
+tuco-after             quick  3/3
+tuco-after             deep   3/3
+cancer-no-foreshadow   quick  3/3
+cancer-no-foreshadow   deep   3/3
+multipart              quick  3/3
+multipart              deep   3/3
+combo-merge            quick  3/3
+combo-merge            deep   3/3
+jane-why               deep   3/3
+
+Total: 45/51 passed in 6.4 min
